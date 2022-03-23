@@ -1,0 +1,53 @@
+name: CD
+on:
+  push:
+    branches:
+      - master
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: Check out code
+      uses: actions/checkout@v2
+
+    - name: Configure AWS credentials
+      uses: aws-actions/configure-aws-credentials@v1
+      with:
+        aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+        aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+        aws-region: ap-northeast-1
+
+    - name: Login to Amazon ECR
+      id: login-ecr
+      uses: aws-actions/amazon-ecr-login@v1
+
+    - name: Build, tag, and push image to Amazon ECR
+      env:
+        ECR_REGISTRY: ${{ steps.login-ecr.outputs.registry }}
+        ECR_REPOSITORY: eks_quickstart
+        IMAGE_TAG: ${{ github.sha }}
+      run: |
+        docker build -t $ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG .
+        docker tag $ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG $ECR_REGISTRY/$ECR_REPOSITORY:latest
+        docker push $ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG
+        docker push $ECR_REGISTRY/$ECR_REPOSITORY:latest
+
+    - name: Create kubeconfig file 
+      env:
+        EKS_CLUSTER: eks_cluster_1
+      run: aws eks update-kubeconfig --region ap-northeast-1 --name $EKS_CLUSTER
+
+    - name: Helm deploy
+      env:
+        NAMESPACE: quickstart
+        RELEASE: eks-quickstart
+      run: |
+        helm upgrade --install $RELEASE charts/eks-quickstart --create-namespace -n $NAMESPACE --set image.tag=${{ github.sha }} --wait --timeout 300s
+
+    - name: Verify EKS Deployment
+      env:
+        NAMESPACE: quickstart
+      run: |
+        kubectl get pod,deploy,replicaset,service,ingress -n $NAMESPACE

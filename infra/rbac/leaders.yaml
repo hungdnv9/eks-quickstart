@@ -1,0 +1,28 @@
+kind: Role
+apiVersion: rbac.authorization.k8s.io/v1
+metadata:
+  name: leader-role
+  namespace: quickstart
+rules:
+- apiGroups: ["", "extensions", "apps", "networking.k8s.io"]
+  resources: ["*"]
+  verbs: ["*"]
+- apiGroups: ["batch"]
+  resources:
+  - jobs
+  - cronjobs
+  verbs: ["*"]
+---
+kind: RoleBinding
+apiVersion: rbac.authorization.k8s.io/v1
+metadata:
+  name: leader-role
+  namespace: quickstart
+subjects:
+- kind: Group
+  name: leader-group
+  apiGroup: rbac.authorization.k8s.io
+roleRef:
+  kind: Role
+  name: leader-role
+  apiGroup: rbac.authorization.k8s.io

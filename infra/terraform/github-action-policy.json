@@ -1,0 +1,34 @@
+{
+    "Version": "2012-10-17",
+    "Statement": [
+      {
+        "Action": [
+          "eks:DescribeCluster*"
+        ],
+        "Effect": "Allow",
+        "Resource": ["*"]
+      },
+      {
+        "Sid" : "GetAuthorizationToken",
+        "Effect" : "Allow",
+        "Action" : [
+          "ecr:GetAuthorizationToken"
+        ],
+        "Resource" : "*"
+      },
+      {
+        "Sid" : "AllowPush",
+        "Effect" : "Allow",
+        "Action" : [
+          "ecr:GetDownloadUrlForLayer",
+          "ecr:BatchGetImage",
+          "ecr:BatchCheckLayerAvailability",
+          "ecr:PutImage",
+          "ecr:InitiateLayerUpload",
+          "ecr:UploadLayerPart",
+          "ecr:CompleteLayerUpload"
+        ],
+        "Resource" : ["*"]
+      }
+    ]
+}

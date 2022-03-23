@@ -1,0 +1,45 @@
+kind: Role
+apiVersion: rbac.authorization.k8s.io/v1
+metadata:
+  name: developers-role
+  namespace: quickstart
+rules:
+- apiGroups:
+  - ""
+  resources:
+  - pods
+  - pods/log
+  verbs:
+  - get
+  - list
+- apiGroups:
+  - apps
+  resources:
+  - deployments
+  - daemonsets
+  - statefulsets
+  - replicasets
+  verbs:
+  - get
+  - list
+- apiGroups:
+  - batch
+  resources:
+  - jobs
+  verbs:
+  - get
+  - list
+---
+kind: RoleBinding
+apiVersion: rbac.authorization.k8s.io/v1
+metadata:
+  name: developers-role
+  namespace: quickstart
+subjects:
+- kind: Group
+  name: developers-group
+  apiGroup: rbac.authorization.k8s.io
+roleRef:
+  kind: Role
+  name: developers-role
+  apiGroup: rbac.authorization.k8s.io

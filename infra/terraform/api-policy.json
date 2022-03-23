@@ -1,0 +1,36 @@
+{
+    "Version": "2012-10-17",
+    "Statement": [
+      {
+        "Effect": "Allow",
+        "Action": [
+          "s3:ListBucket",
+          "s3:GetEncryptionConfiguration"
+        ],
+        "Resource": [
+          "arn:aws:s3:::*"
+        ]
+      },
+      {
+        "Effect": "Allow",
+        "Action": [
+          "s3:PutObject",
+          "s3:PutObjectAcl",
+          "s3:GetObject",
+          "s3:GetObjectAcl"
+        ],
+        "Resource": [
+          "arn:aws:s3:::*"
+        ]
+      },
+      {
+        "Sid": "KMSAccess",
+        "Action": [
+          "kms:Decrypt",
+          "kms:GenerateDataKey"
+        ],
+        "Effect": "Allow",
+        "Resource": ["*"]
+      }
+    ]
+}
